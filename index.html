@@ -9,17 +9,17 @@
 <body>
 
   <div class="container screen">
-    <img src="assets/thumb.png" alt="oh no" onclick="window.location.replace(`game.html`);" oncontextmenu="return false">
+    <img src="assets/thumb.png" alt="oh no" onclick="window.location.replace(`game.html`);" style="cursor: pointer;" oncontextmenu="return false">
   </div>
 
   <div class="container footer">
-    <p>gioco stupido</p>
-    <p><a href="">link inutile</a></p>
+    <p>the cycle.</p>
+    <p> (click the door to begin) </p>
   </div>
 
   <script> 
     const audio = new Audio("mus/thumb.ogg");
-    audio.volume = 0.05;
+    audio.volume = 0.1;
     audio.loop = true;
 
     document.addEventListener("click", () =>

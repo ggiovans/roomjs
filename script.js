@@ -1,20 +1,23 @@
 'use strict';
 
-// const BGambience = { path: "ambience.ogg", vol: 0.35 };
-const BGroom100 = { path: "room100amb.mp3", vol: 0.8 };
+const BGambience = { id: "ambience", path: "ambience.ogg", vol: 0.35 };
+const BGroom100 = { id: "special", path: "room100amb.mp3", vol: 0.8 };
+const BGhide = { id: "hide", path: "hide.ogg", vol: 0.1, min: 0.98, max: 1.02 };
+const BGmachinehum = { id: "hum", path: "hum.wav", vol: 0.9 };
 
-const SFXa200despawn = { path: "a200despawn.mpeg", vol: 1.0, min: 0.85, max: 1.15};
-const SFXa200spawn = { path: "a200spawn.mpeg", vol: 1.0, min: 0.85, max: 1.15 };
+const SFXfakeout = { path: "fake.mpeg", vol: 0.15, min: 0.95, max: 1.05 };
 
+const SFXnormalcharge = { path: "normalcharge.mp3", vol: 0.4, min: 0.95, max: 1.05 };
 const SFXcharge = { path: "charge.mpeg", vol: 0.1, min: 0.95, max: 1.05 };
 const SFXfirstdoor = { path: "firstdoor.mpeg", vol: 0.1, min: 0.95, max: 1.05 };
 const SFXdoor = { path: "door.mpeg", vol: 0.35, min: 0.95, max: 1.05 };
 
-const SFXhideclick = { path: "lockerclick.mp3", vol: 0.5, min: 0.95, max: 1.05 };
-const SFXhide = { path: "hide.ogg", vol: 0.1, min: 0.98, max: 1.02 };
+const SFXhidein = { path: "lockerin.mp3", vol: 0.4, min: 0.90, max: 1.10 };
+const SFXhideout = { path: "lockerout.mp3", vol: 1, min: 0.90, max: 1.10 };
 const SFXtitle = { path: "title.mpeg", vol: 1.0, min: 1, max: 1 };
 
 const SFXflashlight = { path: "flashlight.mpeg", vol: 0.5, min: 0.95, max: 1.05 };
+const SFXbatterypick = { path: "batterypick.wav", vol: 0.3, min: 0.95, max: 1.05 };
 
 const SFXfootstepsFabric = { path: "foostepsFabric.mp3", vol: 0.15, min: 0.70, max: 1.30 };
 const SFXaltfootstepsFabric = { path: "foostepsFabric2.mp3", vol: 0.15, min: 0.70, max: 1.30 };
@@ -22,6 +25,33 @@ const SFXaltfootstepsFabric = { path: "foostepsFabric2.mp3", vol: 0.15, min: 0.7
 const SFXfootstepsMetal = { path: "footstepsMetal.mpeg", vol: 0.15, min: 0.95, max: 1.05 };
 const SFXfootstepsGrass = { path: "footstepsGrass.mp3", vol: 0.5, min: 0.95, max: 1.05 };
 const SFXfootstepsPlastic = { path: "footstepsPlastic.mpeg", vol: 0.15, min: 0.95, max: 1.05 };
+
+const a60sfx =
+{
+  spawn: { path: "RumbleA60.mpeg", vol: 0.2, min: 0.95, max: 1.05 },
+  ambience: { id: "a60_ambience", path: "A60AmbienceV3.mp3", vol: 1 },
+  near: { id: "a60_near", path: "NearbyA60.mp3.mpeg", vol: 0.7 },
+  despawn: { path: "A60despawn.mp3", vol: 0.9, min: 0.95, max: 1.05 },
+  kill: { path: "RushKill.mp3.mpeg", vol: 0.8, min: 0.95, max: 1.05 },
+};
+
+const a200sfx =
+{
+  spawn: { path: "a200spawn.mpeg", vol: 0.1, min: 0.95, max: 1.05 },
+  ambience: { id: "a200_ambience", path: "a200ambience.mpeg", vol: 0.5 },
+  near: { id: "a200_near", path: "a200near.ogg", vol: 0.9 },
+  despawn: { path: "a200despawn.mpeg", vol: 0.9, min: 0.95, max: 1.05 },
+  kill: { path: "a200kill2.mpeg", vol: 0.4, min: 0.95, max: 1.05 },
+}; 
+
+const rushsfx =
+{
+  spawn: { path: "flicker.wav", vol: 1, min: 0.95, max: 1.05 },
+  ambience: { id: "rushfar", path: "rushfar.mpeg", vol: 0.2 },
+  near: { id: "rushnear", path: "rushnear.mpeg", vol: 0.9 },
+  despawn: { path: "rushout.mp3", vol: 0.7, min: 0.95, max: 1.05 },
+  kill: { path: "rushkill.mpeg", vol: 0.3, min: 0.95, max: 1.05 },
+};
 
 const TIME_SCALE = 1.6;
 
@@ -35,6 +65,7 @@ class Game
     this.ctx = this.canvas.getContext("2d");
     this.rooms = [];
     this.specialRooms = [];
+    this.entities = [];
 
     this.currentRoom = new Room("lobby", "assets/room0.png", 
       [
@@ -55,7 +86,7 @@ class Game
 
     this.currentRoom.roomLog();
 
-    this.doorNum = 1;
+    this.doorNum = 95;
     this.nextRoom = null; 
     this.lastFrame = performance.now();
     this.dt = 1;
@@ -63,7 +94,7 @@ class Game
     
     this.fadeAlpha = 0;
     this.fadeDirection = 0;
-    this.lightAlpha = Math.floor(Math.random() * 2) == 0? 0 : 0.9;
+    this.lightAlpha = /*Math.floor(Math.random() * 2) == 0? 0 : 0.9*/ 0;
 
     this.darkCanvas = document.createElement("canvas");
     this.darkCtx = this.darkCanvas.getContext("2d");
@@ -71,7 +102,9 @@ class Game
     this.darkCanvas.height = this.canvas.height;
 
     this.flashlight = new Flashlight(false, this.canvas.width, this.canvas.height);
-    this.batteryCount = 0;
+    this.batteryCount = 10;
+    this.normalsegments = 1; 
+    this.gummysegments = 32;
     this.dispenderActive = false;
 
     this.hideBG = new Image();
@@ -80,19 +113,19 @@ class Game
     this.hideOverlay = new Image();
     this.hideOverlay.src = "assets/hide.png";
 
-    this.flashdrop = new Image();
-    this.flashdrop.src = "assets/flashdrop.png";
+    this.hiding = false; 
 
-    this.gummydrop = new Image();
-    this.gummydrop.src = "assets/gummydrop.png";
-
-    this.hiding = false;
+    this.dead = false;
+    this.deathTimer = 0;
+    this.deathPhase = 0; 
 
     this.subtitle = "";
     this.subtitleTimer = 0;
 
     this.canvas.addEventListener("mousemove", (e) =>
     {
+      if (this.dead) return;
+
       let rect = this.canvas.getBoundingClientRect();
 
       this.flashlight.x = e.clientX - rect.left;
@@ -101,6 +134,8 @@ class Game
 
     window.addEventListener("keydown", (e) =>
     {
+      if (this.dead) return;
+
       if(e.key.toLowerCase() === "f")
       {
         this.flashlight.on = !this.flashlight.wasOn;
@@ -109,8 +144,29 @@ class Game
       }
     });
 
+    window.addEventListener("keydown", (e) => 
+    {
+      if (this.dead) return;
+
+      if (e.key.toLowerCase() === "s") 
+      {
+        console.log("something spawned");
+
+        // if(Math.random() < 0.5) 
+        //   this.entities.push(new A200(a200sfx)); 
+        // else if (Math.random() < 0.5)
+        //   this.entities.push(new A60(a60sfx));
+        // else if (Math.random() < 0.5)
+        //     this.entities.push(new Rush(rushsfx));
+        // else
+        //   this.sp.playSFX(SFXfakeout);
+      }
+    });
+
     window.addEventListener("keydown", (e) =>
     {
+      if (this.dead) return;
+
       if(e.key.toLowerCase() === "r")
       {
         if (this.cooldown > 0)
@@ -129,12 +185,11 @@ class Game
         {
           this.cooldown = 70;
 
-          this.sp.playSFX(SFXcharge); 
+          this.sp.playSFX(SFXnormalcharge); 
 
           this.batteryCount--;
           this.flashlight.batterySegments = 4;
           this.flashlight.drain = 0;
-
         }
       }
     });
@@ -243,25 +298,25 @@ class Game
         new BatteryZone(512, 407, 16),
         new BatteryZone(308, 408, 15)
       ], 
-      605, 263, 90, 30, "20px"),
+      605, 263, 90, 30, "20px")
 
-      new Room("room_100", "assets/room100.png", //remove later
-      [
-        new Zone(475, 352, 62, 85, () => this.goToNext()),
-        new Zone(174, 389, 96, 45, () => this.getGummy()),
-      ],
-      [
-        new BatteryZone(154, 484, 27, 1),
-        new BatteryZone(297, 481, 20),
-        new BatteryZone(907, 501),
-        new BatteryZone(878, 431),
-        new BatteryZone(772, 425),
-        new BatteryZone(606, 376, 16),
-        new BatteryZone(613, 331, 15),
-        new BatteryZone(809, 502)
-      ], 
-      478, 327, 56, 19, "15px", "grass", 0.8)
-    ];
+    //   new Room("room_100", "assets/room100.png", //remove later
+    //   [
+    //     new Zone(475, 352, 62, 85, () => this.goToNext()),
+    //     new Zone(174, 389, 96, 45, () => this.getGummy()),
+    //   ],
+    //   [
+    //     new BatteryZone(154, 484, 27, 1),
+    //     new BatteryZone(297, 481, 20),
+    //     new BatteryZone(907, 501),
+    //     new BatteryZone(878, 431),
+    //     new BatteryZone(772, 425),
+    //     new BatteryZone(606, 376, 16),
+    //     new BatteryZone(613, 331, 15),
+    //     new BatteryZone(809, 502)
+    //   ], 
+    //   478, 327, 56, 19, "15px", "grass", 0.8)
+     ];
 
     this.specialRooms = 
     [
@@ -285,6 +340,8 @@ class Game
     
     this.canvas.addEventListener("click", (e) => 
     {
+      if (this.dead) return;
+
       if (this.cooldown > 0)
         return;
 
@@ -302,6 +359,7 @@ class Game
         if (z.isIn(x, y)) 
         {
           z.collect();
+          this.sp.playSFX(SFXbatterypick);
           this.batteryCount += z.qta;
           return;
         }
@@ -310,23 +368,6 @@ class Game
       this.currentRoom.handleClick(x, y);
       
     });
-
-    // this.canvas.addEventListener("mousemove", (e) => {
-    //   let rect = this.canvas.getBoundingClientRect();
-    //   let x = e.clientX - rect.left;
-    //   let y = e.clientY - rect.top;
-
-    //   let hoveringDoor = this.currentRoom.zones.some(z =>
-    //     x >= z.x && x <= z.x + z.w &&
-    //     y >= z.y && y <= z.y + z.h
-    //   );
-
-    //   if (this.lightAlpha < 0.95 || this.flashlight.on)
-    //     this.canvas.style.cursor = (hoveringDoor) ? "pointer" : "default";
-
-    //   if (this.hiding)
-    //     this.canvas.style.cursor = "grab";
-    // });
 
     this.ctx.textBaseline = "middle"; //might be moved if I wanna have subtitles as well
     this.ctx.textAlign = "center";
@@ -365,7 +406,7 @@ class Game
 
     switch(this.doorNum)
     {
-      case 10: this.startTransition(this.specialRooms[0]); return;
+      case 100: this.startTransition(this.specialRooms[0]); return;
     }
     
     this.startTransition(this.randomRoom());
@@ -375,24 +416,19 @@ class Game
   {
     this.cooldown = 75;
 
-    this.sp.playSFX(SFXhideclick);
+    this.sp.playSFX(SFXhidein);
     this.hiding = true;
-    this.sp.playBG(SFXhide, true)
+    this.sp.playBG(BGhide)
   }
 
   unhide() 
   {
     this.cooldown = 75;
 
-    this.sp.playSFX(SFXhideclick);
+    this.sp.playSFX(SFXhideout);
     this.hiding = false;
-    this.sp.stopBG();
+    this.sp.stopBG("hide");
   }
-
-  // spawnEnemy() 
-  // {
-  //   this.showDoorNum("Enemy appears!");
-  // }
 
   update()
   {
@@ -454,6 +490,76 @@ class Game
         this.subtitleTimer = 0;
       }
     }
+
+    this.updateEntities();
+    this.updateDeath(this.dt);
+  }
+
+  updateEntities()
+  {
+    for (let x of this.entities) 
+    {
+      x.update(this.dt);
+
+      if (!this.hiding && x.checkKill())
+      {
+        console.log("you died bro");
+
+        x.dead = true;
+
+        this.sp.stopALL();
+        x.sp.stopALL();
+
+        this.dead = true;
+      }
+    }
+
+    this.entities = this.entities.filter(x => !x.dead);
+  }
+
+  spawnEntity()
+  {
+    if(this.doorNum == 100)
+      return;
+
+    if (Math.random() < 0.005 && this.doorNum >= 50)
+    {
+      console.log("fakeout");
+      this.sp.playSFX(SFXfakeout);
+    }
+    else if(Math.random() < Math.min(0.0005 * this.doorNum, 0.2) && this.doorNum >= 60)
+    {
+      console.log("a60 spawned");
+      this.entities.push(new A60(a60sfx));
+    }
+
+    if (Math.random() < Math.min(0.001 * this.doorNum, 0.25) && this.doorNum >= 200)
+    {
+      console.log("a200 spawned");
+      this.entities.push(new A200(a200sfx));
+    }
+
+    if(Math.random() < 0.0005 && this.doorNum >= 100)
+    {
+      console.log("WTF Rush spawned");
+      this.entities.push(new Rush(rushsfx));
+    }
+  }
+
+  updateDeath(dt) 
+  {
+    if (!this.dead) return;
+
+    this.deathTimer += dt;
+
+    if (this.deathPhase === 0) 
+    {
+      if (this.deathTimer > 300) 
+      {
+        this.deathTimer = 0;
+        this.deathPhase = 1;
+      }
+    }
   }
 
   draw() 
@@ -461,6 +567,7 @@ class Game
     if (!this.currentRoom.image.complete) return;
 
     this.currentRoom.draw(this.ctx);
+    this.showGummy();
 
     let text = this.message;
     this.ctx.font = `bold ${this.currentRoom.fontSize} Calibri`;
@@ -494,13 +601,15 @@ class Game
 
     if(this.currentRoom.forceAlpha !== 1)
       darknessAlpha = this.currentRoom.forceAlpha;
-    
-    // if (this.hiding) 
-    //   darknessAlpha = Math.min(darknessAlpha, 0.95);
 
     this.darkCtx.globalAlpha = darknessAlpha;
     this.darkCtx.fillStyle = "black";
     this.darkCtx.fillRect(0, 0, this.darkCanvas.width, this.darkCanvas.height);
+
+    for (let e of this.entities) 
+    {
+      e.draw(this.darkCtx, this.ctx);
+    }
 
     if (this.hiding)
       this.ctx.drawImage(this.hideOverlay, 0, 0, this.canvas.width, this.canvas.height);
@@ -610,6 +719,7 @@ class Game
 
     this.ctx.restore(); 
 
+    this.drawDeathOverlay(); 
     this.drawSubtitles();
   }
 
@@ -636,11 +746,58 @@ class Game
     this.ctx.restore();
   }
 
+  drawDeathOverlay() 
+  {
+    if (!this.dead) return;
+
+    let alpha = 0;
+
+    if (this.deathPhase === 0) 
+    {
+      this.ctx.save();
+      this.ctx.fillStyle = "rgb(120, 0, 0)";
+      this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+      this.ctx.restore();
+      return;
+    }
+
+    if (this.deathPhase === 1) 
+    {
+      let t = Math.min(this.deathTimer / 2, 1);
+
+      this.ctx.save();
+      this.ctx.fillStyle = `rgba(120, 0, 0, ${1 - t})`;
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+      this.ctx.fillStyle = `rgba(0,0,0,${t * 0.4})`;
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.restore();
+
+      this.ctx.save();
+      this.ctx.globalCompositeOperation = "saturation";
+      this.ctx.fillStyle = `rgba(133, 133, 133,${t})`; 
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.restore();
+
+      if (t >= 1) 
+      {
+        this.lightAlpha = 0;
+        this.showSubtitle("you died. this is the end.");
+      }
+    }
+  }
+
   updateCursor() 
   {
     if (this.hiding) 
     {
       this.canvas.style.cursor = "grab"; //replace with custom
+      return;
+    }
+
+    if(this.dead)
+    {
+      this.canvas.style.cursor = "default";
       return;
     }
 
@@ -659,7 +816,7 @@ class Game
     {
       if (this.batteryCount < 5) 
       {
-        this.showSubtitle("You don't have enough batteries.");
+        this.showSubtitle("You need 5 batteries for this.");
         return;
       }
 
@@ -667,12 +824,29 @@ class Game
       this.dispenderActive = true;
       this.showSubtitle("You inserted 5 batteries into the dispenser... Something came out.");
 
-      this.showGummy();
+      this.sp.playSFX(SFXnormalcharge); 
+      this.sp.playBG(BGmachinehum);
     }
     else
     {
-      this.flashlight = new Flashlight(!this.flashlight.isGummy, this.canvas.width, this.canvas.height); 
+      if(!this.flashlight.isGummy)
+        this.normalsegments = this.flashlight.batterySegments;
+      else
+        this.gummysegments = this.flashlight.batterySegments;
+
+      this.flashlight = new Flashlight(!this.flashlight.isGummy, this.canvas.width, this.canvas.height, this.flashlight.isGummy? this.normalsegments : this.gummysegments); 
       this.showSubtitle(this.flashlight.isGummy ? "Gummy Flashlight. Infinite battery with a much shorter durability. Recharge at any time with R." : "You picked up back the normal flashlight.");
+    }
+  }
+
+  showGummy()
+  {
+    if(this.dispenderActive && this.doorNum == 100)
+    {
+      let img = new Image();
+      img.src = this.flashlight.isGummy ? "assets/flashdrop.png" : "assets/gummydrop.png";
+
+      this.ctx.drawImage(img, 191, 407);
     }
   }
 
@@ -727,8 +901,10 @@ class Game
     switch (newRoom.name)
     {
       case "room_100": this.sp.playBG(BGroom100, true); break;
-      default: this.sp.stopBG(); break;
+      default: this.sp.stopBG("special"); this.sp.stopBG("hum"); break;
     }
+
+    this.spawnEntity();
   }
 }
 
