@@ -86,7 +86,7 @@ class Game
 
     this.currentRoom.roomLog();
 
-    this.doorNum = 95;
+    this.doorNum = 1;
     this.nextRoom = null; 
     this.lastFrame = performance.now();
     this.dt = 1;
@@ -102,7 +102,7 @@ class Game
     this.darkCanvas.height = this.canvas.height;
 
     this.flashlight = new Flashlight(false, this.canvas.width, this.canvas.height);
-    this.batteryCount = 10;
+    this.batteryCount = 0;
     this.normalsegments = 1; 
     this.gummysegments = 32;
     this.dispenderActive = false;
