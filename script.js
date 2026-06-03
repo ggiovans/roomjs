@@ -53,7 +53,7 @@ const rushsfx =
   kill: { path: "rushkill.mpeg", vol: 0.3, min: 0.95, max: 1.05 },
 };
 
-const TIME_SCALE = 1.6;
+const fix60fps = 1.6;
 
 class Game 
 {
@@ -114,6 +114,7 @@ class Game
     this.hideOverlay.src = "assets/hide.png";
 
     this.hiding = false; 
+    this.hidingtransition = null;
 
     this.dead = false;
     this.deathTimer = 0;
@@ -152,14 +153,14 @@ class Game
       {
         console.log("something spawned");
 
-        // if(Math.random() < 0.5) 
-        //   this.entities.push(new A200(a200sfx)); 
-        // else if (Math.random() < 0.5)
-        //   this.entities.push(new A60(a60sfx));
-        // else if (Math.random() < 0.5)
-        //     this.entities.push(new Rush(rushsfx));
-        // else
-        //   this.sp.playSFX(SFXfakeout);
+        if(Math.random() < 0.5) 
+          this.entities.push(new A200(a200sfx)); 
+        else if (Math.random() < 0.5)
+          this.entities.push(new A60(a60sfx));
+        else if (Math.random() < 0.5)
+            this.entities.push(new Rush(rushsfx));
+        else
+          this.sp.playSFX(SFXfakeout);
       }
     });
 
@@ -414,40 +415,56 @@ class Game
 
   hide() 
   {
+    this.hidingtransition = () => { this.hiding = true; }   
+    
     this.cooldown = 75;
 
     this.sp.playSFX(SFXhidein);
-    this.hiding = true;
     this.sp.playBG(BGhide)
+
+    this.fadeDirection = 1;
+
   }
 
   unhide() 
   {
+    this.hidingtransition = () => { this.hiding = false; }   
+
     this.cooldown = 75;
 
     this.sp.playSFX(SFXhideout);
-    this.hiding = false;
-    this.sp.stopBG("hide");
+    this.sp.stopBG(BGhide.id);
+
+    this.fadeDirection = 1;
   }
 
   update()
   {
     if(this.fadeDirection !== 0)
     {
-      this.fadeAlpha += 0.025 * this.fadeDirection * this.dt * TIME_SCALE;
+      let step = this.hidingtransition? 0.05 : 0.025;
+
+      this.fadeAlpha += step * this.fadeDirection * this.dt * fix60fps;
 
       if(this.fadeAlpha >= 1)
       {
         this.fadeAlpha = 1;
 
-        this.currentRoom = this.nextRoom;
-
-        for (let z of this.currentRoom.batteryZones) 
+        if(this.hidingtransition)
         {
-          z.roll();
+          this.hidingtransition();
+          this.hidingtransition = null;
         }
+        else
+        {
+          this.currentRoom = this.nextRoom;
 
-        this.showDoorNum("A-" + ((this.doorNum).toString().padStart(3, "0")));
+          for (let z of this.currentRoom.batteryZones) {
+            z.roll();
+          }
+
+          this.showDoorNum("A-" + ((this.doorNum).toString().padStart(3, "0")));
+        }
 
         this.fadeDirection = -1;
       }
@@ -461,12 +478,12 @@ class Game
 
     if(this.cooldown > 0)
     {
-      this.cooldown -= this.dt * TIME_SCALE;
+      this.cooldown -= this.dt * fix60fps;
     }
 
     if(this.flashlight.on)
     {
-      this.flashlight.drain += this.flashlight.drainFactor * this.dt * TIME_SCALE;
+      this.flashlight.drain += this.flashlight.drainFactor * this.dt * fix60fps;
     }
 
     if(this.flashlight.drain >= 25)
@@ -789,15 +806,15 @@ class Game
 
   updateCursor() 
   {
-    if (this.hiding) 
+    if (this.dead) 
     {
-      this.canvas.style.cursor = "grab"; //replace with custom
+      this.canvas.style.cursor = "default";
       return;
     }
 
-    if(this.dead)
+    if (this.hiding) 
     {
-      this.canvas.style.cursor = "default";
+      this.canvas.style.cursor = "grab"; //replace with custom
       return;
     }
 

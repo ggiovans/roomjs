@@ -356,8 +356,10 @@ class Entity
         this.sp.muteBG(this.sfx.near.id);
         this.sp.muteBG(this.sfx.ambience.id);
 
-        this.sp.stopBG(this.sfx.near.id);
-        this.sp.stopBG(this.sfx.ambience.id);
+        setTimeout(() => {
+          this.sp.stopBG(this.sfx.near.id);
+          this.sp.stopBG(this.sfx.ambience.id);
+        }, 700);
       }
     }
   }
@@ -417,7 +419,7 @@ class A60 extends Entity
   {
     super(sfx, 170, 300, 1, 60, 0, 1, 1000);
 
-    this.threshR = 2400 + Math.floor(Math.random() * 1001);
+    this.threshR = 2700 + Math.floor(Math.random() * 1001);
     this.threshL = -7000 - Math.floor(Math.random() * 1001) * (this.speed / 3);
 
     this.x = this.dir == 1 ? this.threshL : this.threshR;
@@ -460,7 +462,7 @@ class A200 extends Entity
   {
     super(sfx, 200, 300, Math.random() < 0.5? 1 : -1, 20, 1, 4, 800);
 
-    this.threshR = 2400 + Math.floor(Math.random() * 1001);
+    this.threshR = 2700 + Math.floor(Math.random() * 1001);
     this.threshL = -5500 - Math.floor(Math.random() * 1001) * (this.speed / 3);
 
     this.x = this.dir == 1 ? this.threshL : this.threshR;
@@ -502,7 +504,7 @@ class Rush extends Entity
   {
     super(sfx, 200, 300, 1, 50, 0, 0, 20000);
 
-    this.threshR = 2400 + Math.floor(Math.random() * 1001);
+    this.threshR = 2700 + Math.floor(Math.random() * 1001);
     this.threshL = -15500 - Math.floor(Math.random() * 1001) * (this.speed / 3);
 
     this.x = this.threshL;
