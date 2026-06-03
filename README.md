@@ -12,7 +12,7 @@ rooms but it's point and click and it sucks
 - Freesound.org
 - Pixabay.com
 - Roblox Creator Market audio
-- edited through [audiomass](audiomass.co)
+- edited through [audiomass](https://audiomass.co)
 
 ## rooms
-they were built using roblox studio, then screenshotted and modified as images through [paint.net](paint.net)
+they were built using roblox studio, then screenshotted and modified as images through [paint.net](https://paint.net)
