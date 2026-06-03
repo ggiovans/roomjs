@@ -10,7 +10,7 @@ const SFXfakeout = { path: "fake.mpeg", vol: 0.15, min: 0.95, max: 1.05 };
 const SFXnormalcharge = { path: "normalcharge.mp3", vol: 0.4, min: 0.95, max: 1.05 };
 const SFXcharge = { path: "charge.mpeg", vol: 0.1, min: 0.95, max: 1.05 };
 const SFXfirstdoor = { path: "firstdoor.mpeg", vol: 0.1, min: 0.95, max: 1.05 };
-const SFXdoor = { path: "door.mpeg", vol: 0.35, min: 0.85, max: 1.15 };
+const SFXdoor = { path: "door.mpeg", vol: 0.35, min: 0.90, max: 1.10 };
 
 const SFXhidein = { path: "lockerin.mp3", vol: 0.4, min: 0.90, max: 1.10 };
 const SFXhideout = { path: "lockerout.mp3", vol: 1, min: 0.90, max: 1.10 };
@@ -29,10 +29,10 @@ const SFXfootstepsPlastic = { path: "footstepsPlastic.mpeg", vol: 0.15, min: 0.9
 const a60sfx =
 {
   spawn: { path: "RumbleA60.mpeg", vol: 0.2, min: 0.95, max: 1.05 },
-  ambience: { id: "a60_ambience", path: "a60AmbienceV3.mp3", vol: 1 },
-  near: { id: "a60_near", path: "NearbyA60.mp3.mpeg", vol: 0.7 },
+  ambience: { id: "a60_ambience", path: "A60AmbienceV3.mp3", vol: 1 },
+  near: { id: "a60_near", path: "NearbyA60.mpeg", vol: 0.7 },
   despawn: { path: "A60despawn.mp3", vol: 0.9, min: 0.95, max: 1.05 },
-  kill: { path: "RushKill.mp3.mpeg", vol: 0.8, min: 0.95, max: 1.05 },
+  kill: { path: "A60Kill.mpeg", vol: 0.8, min: 0.95, max: 1.05 },
 };
 
 const a200sfx =
@@ -151,7 +151,7 @@ class Game
 
       if (e.key.toLowerCase() === "s") 
       {
-        if(window.location.href.includes ("https://ggiovans.github.io/roomjs"))
+        if((window.location.href).includes("ggiovans.github.io/roomjs"))
           return;
 
         console.log("something spawned");
